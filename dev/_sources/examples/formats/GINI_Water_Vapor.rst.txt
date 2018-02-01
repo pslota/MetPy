@@ -18,7 +18,7 @@ data using CartoPy.
 
     from metpy.cbook import get_test_data
     from metpy.io import GiniFile
-    from metpy.plots import add_metpy_logo, ctables
+    from metpy.plots import add_metpy_logo, add_timestamp, ctables
 
 
 
@@ -111,6 +111,7 @@ data using CartoPy.
     im = ax.imshow(dat[:], cmap=wv_cmap, norm=wv_norm, zorder=0,
                    extent=ds.img_extent, origin='upper')
     ax.coastlines(resolution='50m', zorder=2, color='black')
+    add_timestamp(ax, f.prod_desc.datetime, y=0.02, high_contrast=True)
 
     plt.show()
 
@@ -122,7 +123,7 @@ data using CartoPy.
 
 
 
-**Total running time of the script:** ( 0 minutes  0.364 seconds)
+**Total running time of the script:** ( 0 minutes  0.399 seconds)
 
 
 

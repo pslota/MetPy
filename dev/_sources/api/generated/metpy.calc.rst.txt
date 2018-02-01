@@ -14,6 +14,9 @@ calc
       add_height_to_pressure
       add_pressure_to_height
       advection
+      brunt_vaisala_frequency
+      brunt_vaisala_frequency_squared
+      brunt_vaisala_period
       bulk_shear
       bunkers_storm_motion
       cape_cin
@@ -39,6 +42,7 @@ calc
       get_wind_components
       get_wind_dir
       get_wind_speed
+      gradient
       h_convergence
       heat_index
       height_to_geopotential

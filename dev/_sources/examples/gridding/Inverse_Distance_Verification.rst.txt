@@ -240,8 +240,8 @@ Step through the cressman calculations.
 
  Out::
 
-    Manual cressman value for grid 1:        1.05499444404
-    Metpy cressman value for grid 1:         1.05499444404
+    Manual cressman value for grid 1:        1.0549944440419021
+    Metpy cressman value for grid 1:         1.0549944440416752
 
 
 Now repeat for grid 1, except use barnes interpolation.
@@ -304,11 +304,11 @@ Step through barnes calculations.
 
  Out::
 
-    Manual barnes value:     4.08718241061
-    Metpy barnes value:      4.08718241061
+    Manual barnes value:     4.087182410612323
+    Metpy barnes value:      4.087182410612151
 
 
-**Total running time of the script:** ( 0 minutes  0.178 seconds)
+**Total running time of the script:** ( 0 minutes  0.196 seconds)
 
 
 

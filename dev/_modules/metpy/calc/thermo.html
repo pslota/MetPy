@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>metpy.calc.thermo &mdash; MetPy 0.6</title>
+  <title>metpy.calc.thermo &mdash; MetPy 0.7</title>
   
 
   
@@ -43,7 +43,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="MetPy 0.6" href="../../../index.html"/>
+    <link rel="top" title="MetPy 0.7" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -79,7 +79,7 @@
                 
                   <div class="version-dropdown">
                     <select class="version-list" id="version-list">
-                      <option value=''>0.6</option>
+                      <option value=''>0.7</option>
                       
                         
                           <option value="../latest">latest</option>
@@ -203,7 +203,7 @@
 <span class="kn">import</span> <span class="nn">scipy.optimize</span> <span class="k">as</span> <span class="nn">so</span>
 
 <span class="kn">from</span> <span class="nn">.tools</span> <span class="k">import</span> <span class="p">(</span><span class="n">_greater_or_close</span><span class="p">,</span> <span class="n">_less_or_close</span><span class="p">,</span> <span class="n">broadcast_indices</span><span class="p">,</span> <span class="n">find_intersections</span><span class="p">,</span>
-                    <span class="n">get_layer</span><span class="p">,</span> <span class="n">interp</span><span class="p">)</span>
+                    <span class="n">first_derivative</span><span class="p">,</span> <span class="n">get_layer</span><span class="p">,</span> <span class="n">interp</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">..constants</span> <span class="k">import</span> <span class="n">Cp_d</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">Lv</span><span class="p">,</span> <span class="n">P0</span><span class="p">,</span> <span class="n">Rd</span>
 <span class="kn">from</span> <span class="nn">..package_tools</span> <span class="k">import</span> <span class="n">Exporter</span>
 <span class="kn">from</span> <span class="nn">..units</span> <span class="k">import</span> <span class="n">atleast_1d</span><span class="p">,</span> <span class="n">check_units</span><span class="p">,</span> <span class="n">concatenate</span><span class="p">,</span> <span class="n">units</span>
@@ -1033,7 +1033,8 @@
 <span class="sd">    relative_humidity_from_mixing_ratio, saturation_mixing_ratio</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">relative_humidity</span> <span class="o">*</span> <span class="n">saturation_mixing_ratio</span><span class="p">(</span><span class="n">pressure</span><span class="p">,</span> <span class="n">temperature</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="p">(</span><span class="n">relative_humidity</span> <span class="o">*</span>
+            <span class="n">saturation_mixing_ratio</span><span class="p">(</span><span class="n">pressure</span><span class="p">,</span> <span class="n">temperature</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;dimensionless&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="relative_humidity_from_mixing_ratio"><a class="viewcode-back" href="../../../api/generated/metpy.calc.relative_humidity_from_mixing_ratio.html#metpy.calc.relative_humidity_from_mixing_ratio">[docs]</a><span class="nd">@exporter</span><span class="o">.</span><span class="n">export</span>
@@ -1901,6 +1902,123 @@
 
     <span class="k">return</span> <span class="n">thickness_hydrostatic</span><span class="p">(</span><span class="n">pressure</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">mixing</span><span class="o">=</span><span class="n">mixing</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="n">bottom</span><span class="p">,</span>
                                  <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="brunt_vaisala_frequency_squared"><a class="viewcode-back" href="../../../api/generated/metpy.calc.brunt_vaisala_frequency_squared.html#metpy.calc.brunt_vaisala_frequency_squared">[docs]</a><span class="nd">@exporter</span><span class="o">.</span><span class="n">export</span>
+<span class="nd">@check_units</span><span class="p">(</span><span class="s1">&#39;[length]&#39;</span><span class="p">,</span> <span class="s1">&#39;[temperature]&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">brunt_vaisala_frequency_squared</span><span class="p">(</span><span class="n">heights</span><span class="p">,</span> <span class="n">potential_temperature</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate the square of the Brunt-Vaisala frequency.</span>
+
+<span class="sd">    Brunt-Vaisala frequency squared (a measure of atmospheric stability) is given by the</span>
+<span class="sd">    formula:</span>
+
+<span class="sd">    .. math:: N^2 = \frac{g}{\theta} \frac{d\theta}{dz}</span>
+
+<span class="sd">    This formula is based off of Equations 3.75 and 3.77 in [Hobbs2006]_.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    heights : array-like</span>
+<span class="sd">        One-dimensional profile of atmospheric height</span>
+<span class="sd">    potential_temperature : array-like</span>
+<span class="sd">        Atmospheric potential temperature</span>
+<span class="sd">    axis : int, optional</span>
+<span class="sd">        The axis corresponding to vertical in the potential temperature array, defaults to 0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    array-like</span>
+<span class="sd">        The square of the Brunt-Vaisala frequency.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    brunt_vaisala_frequency, brunt_vaisala_period, potential_temperature</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Ensure validity of temperature units</span>
+    <span class="n">potential_temperature</span> <span class="o">=</span> <span class="n">potential_temperature</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;K&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Calculate and return the square of Brunt-Vaisala frequency</span>
+    <span class="k">return</span> <span class="n">g</span> <span class="o">/</span> <span class="n">potential_temperature</span> <span class="o">*</span> <span class="n">first_derivative</span><span class="p">(</span><span class="n">potential_temperature</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">heights</span><span class="p">,</span>
+                                                        <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="brunt_vaisala_frequency"><a class="viewcode-back" href="../../../api/generated/metpy.calc.brunt_vaisala_frequency.html#metpy.calc.brunt_vaisala_frequency">[docs]</a><span class="nd">@exporter</span><span class="o">.</span><span class="n">export</span>
+<span class="nd">@check_units</span><span class="p">(</span><span class="s1">&#39;[length]&#39;</span><span class="p">,</span> <span class="s1">&#39;[temperature]&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">brunt_vaisala_frequency</span><span class="p">(</span><span class="n">heights</span><span class="p">,</span> <span class="n">potential_temperature</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate the Brunt-Vaisala frequency.</span>
+
+<span class="sd">    This function will calculate the Brunt-Vaisala frequency as follows:</span>
+
+<span class="sd">    .. math:: N = \left( \frac{g}{\theta} \frac{d\theta}{dz} \right)^\frac{1}{2}</span>
+
+<span class="sd">    This formula based off of Equations 3.75 and 3.77 in [Hobbs2006]_.</span>
+
+<span class="sd">    This function is a wrapper for `brunt_vaisala_frequency_squared` that filters out negative</span>
+<span class="sd">    (unstable) quanties and takes the square root.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    heights : array-like</span>
+<span class="sd">        One-dimensional profile of atmospheric height</span>
+<span class="sd">    potential_temperature : array-like</span>
+<span class="sd">        Atmospheric potential temperature</span>
+<span class="sd">    axis : int, optional</span>
+<span class="sd">        The axis corresponding to vertical in the potential temperature array, defaults to 0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    array-like</span>
+<span class="sd">        Brunt-Vaisala frequency.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    brunt_vaisala_frequency_squared, brunt_vaisala_period, potential_temperature</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bv_freq_squared</span> <span class="o">=</span> <span class="n">brunt_vaisala_frequency_squared</span><span class="p">(</span><span class="n">heights</span><span class="p">,</span> <span class="n">potential_temperature</span><span class="p">,</span>
+                                                      <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+    <span class="n">bv_freq_squared</span><span class="p">[</span><span class="n">bv_freq_squared</span><span class="o">.</span><span class="n">magnitude</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">bv_freq_squared</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="brunt_vaisala_period"><a class="viewcode-back" href="../../../api/generated/metpy.calc.brunt_vaisala_period.html#metpy.calc.brunt_vaisala_period">[docs]</a><span class="nd">@exporter</span><span class="o">.</span><span class="n">export</span>
+<span class="nd">@check_units</span><span class="p">(</span><span class="s1">&#39;[length]&#39;</span><span class="p">,</span> <span class="s1">&#39;[temperature]&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">brunt_vaisala_period</span><span class="p">(</span><span class="n">heights</span><span class="p">,</span> <span class="n">potential_temperature</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate the Brunt-Vaisala period.</span>
+
+<span class="sd">    This function is a helper function for `brunt_vaisala_frequency` that calculates the</span>
+<span class="sd">    period of oscilation as in Exercise 3.13 of [Hobbs2006]_:</span>
+
+<span class="sd">    .. math:: \tau = \frac{2\pi}{N}</span>
+
+<span class="sd">    Returns `NaN` when :math:`N^2 &gt; 0`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    heights : array-like</span>
+<span class="sd">        One-dimensional profile of atmospheric height</span>
+<span class="sd">    potential_temperature : array-like</span>
+<span class="sd">        Atmospheric potential temperature</span>
+<span class="sd">    axis : int, optional</span>
+<span class="sd">        The axis corresponding to vertical in the potential temperature array, defaults to 0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    array-like</span>
+<span class="sd">        Brunt-Vaisala period.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    brunt_vaisala_frequency, brunt_vaisala_frequency_squared, potential_temperature</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bv_freq_squared</span> <span class="o">=</span> <span class="n">brunt_vaisala_frequency_squared</span><span class="p">(</span><span class="n">heights</span><span class="p">,</span> <span class="n">potential_temperature</span><span class="p">,</span>
+                                                      <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+    <span class="n">bv_freq_squared</span><span class="p">[</span><span class="n">bv_freq_squared</span><span class="o">.</span><span class="n">magnitude</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">bv_freq_squared</span><span class="p">)</span></div>
 </pre></div>
 
            </div>
@@ -1916,7 +2034,7 @@
   <div role="contentinfo">
     <p>
         &copy; Copyright 2017, MetPy Developers.
-      Last updated on Jan 04, 2018 at 19:17:05.
+      Last updated on Feb 01, 2018 at 00:40:18.
 
     </p>
   </div>
@@ -1953,7 +2071,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.6.1+116.gba13b4c',
+            VERSION:'0.7.0+23.g2296b88',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

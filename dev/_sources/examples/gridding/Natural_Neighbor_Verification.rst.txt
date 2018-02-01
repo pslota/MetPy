@@ -193,7 +193,7 @@ grid 0 included in that circle?
  Out::
 
     Distance between grid0 and Triangle 8 circumcenter: 25.30650398368644
-    Triangle 8 circumradius: 25.2587678
+    Triangle 8 circumradius: 25.258767799971746
 
 
 Lets do a manual check of the above interpolation value for grid 0 (southernmost grid)
@@ -218,10 +218,10 @@ Grab the circumcenters and radii for natural neighbors
  Out::
 
     circumcenters:
-     [[ 36.32995951  48.24358974]
-     [ 21.          40.15277778]]
+     [[36.32995951 48.24358974]
+     [21.         40.15277778]]
     radii
-     [ 24.35529419  20.73432492]
+     [24.35529419 20.73432492]
 
 
 Draw the natural neighbor triangles and their circumcenters. Also plot a `Voronoi diagram
@@ -322,7 +322,7 @@ Calculate the total area of all of the generated polygons.
 
  Out::
 
-    605.293
+    605.2930000000001
 
 
 For each polygon area, calculate its percent of total area.
@@ -342,7 +342,7 @@ For each polygon area, calculate its percent of total area.
 
  Out::
 
-    [ 0.09984256  0.74062644  0.04281563  0.11671538]
+    [0.09984256 0.74062644 0.04281563 0.11671538]
 
 
 Multiply the percent of total area by the respective values.
@@ -362,7 +362,7 @@ Multiply the percent of total area by the respective values.
 
  Out::
 
-    [ 0.00638992  0.85616417  0.1202691   0.02626096]
+    [0.00638992 0.85616417 0.1202691  0.02626096]
 
 
 The sum of this array is the interpolation value!
@@ -384,14 +384,14 @@ The sum of this array is the interpolation value!
 
  Out::
 
-    1.00908414768 1.00908424443
+    1.0090841476772403 1.009084244425604
 
 
 The values are slightly different due to truncating the area values in
 the above visual example to the 3rd decimal place.
 
 
-**Total running time of the script:** ( 0 minutes  0.195 seconds)
+**Total running time of the script:** ( 0 minutes  0.208 seconds)
 
 
 
